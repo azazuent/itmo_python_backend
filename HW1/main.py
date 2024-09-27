@@ -20,9 +20,8 @@ async def application(scope: dict[str, Any],
         await reply_not_found(send)
         return
 
-    params = parse_qs(scope["query_string"].decode())
-
     if path == "/factorial":
+        params = parse_qs(scope["query_string"].decode())
         n = params.get("n")
         if n is None or len(n) != 1 or not re.match(r"^[+-]?[0-9]+$", n[0]):
             await reply_unprocessable_entity(send)
