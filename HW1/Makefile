@@ -1,8 +1,12 @@
 install:
-	python -m pip install -r requirements.txt || python3 -m pip install -r requirements.txt
+	 python3 -m venv venv || python -m venv venv
+	./venv/bin/pip install -r requirements.txt || .\venv\Scripts\pip install -r requirements.txt
 
 run:
-	python -m uvicorn "main:application" || python3 -m uvicorn "main:application"
+	./venv/bin/python -m uvicorn "main:application" || .\venv\Scripts\python.exe -m uvicorn "main:application"
 
 test:
-	python -m pytest ../tests/test_homework_1.py || python3 -m pytest ../tests/test_homework_1.py
+	./venv/bin/python -m pytest ../tests/test_homework_1.py || .\venv\Scripts\python.exe -m pytest ../tests/test_homework_1.py
+
+clean:
+	rm -rf ./venv || rd /s /q venv
