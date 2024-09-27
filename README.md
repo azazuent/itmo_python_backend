@@ -1,5 +1,6 @@
     Homework 1: cd HW1
 
-    Install dependencies: make install
+    Create venv and install dependencies: make install
     Launch server: make run
     Run tests: make test
+    Delete venv: make clean
