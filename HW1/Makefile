@@ -1,8 +1,8 @@
 install:
-	pip install -r requirements.txt
+	python -m pip install -r requirements.txt
 
 run:
-	uvicorn "main:application"
+	python -m uvicorn "main:application" || python3 -m uvicorn "main:application"
 
 test:
-	pytest ../tests/test_homework_1.py
+	python -m pytest ../tests/test_homework_1.py || python3 -m pytest ../tests/test_homework_1.py
