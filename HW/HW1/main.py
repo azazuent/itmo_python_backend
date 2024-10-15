@@ -6,7 +6,7 @@ from http import HTTPStatus
 import json
 from urllib.parse import parse_qs
 
-from utils import reply, reply_bad_request, reply_unprocessable_entity, reply_not_found
+from .utils import reply, reply_bad_request, reply_unprocessable_entity, reply_not_found
 
 
 async def application(scope: dict[str, Any],
