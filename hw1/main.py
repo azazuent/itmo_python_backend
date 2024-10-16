@@ -9,9 +9,9 @@ from urllib.parse import parse_qs
 from .utils import reply, reply_bad_request, reply_unprocessable_entity, reply_not_found
 
 
-async def application(scope: dict[str, Any],
-                      receive: Callable[[], Awaitable[dict[str, Any]]],
-                      send: Callable[[dict[str, Any]], Awaitable[None]]) -> None:
+async def app(scope: dict[str, Any],
+              receive: Callable[[], Awaitable[dict[str, Any]]],
+              send: Callable[[dict[str, Any]], Awaitable[None]]) -> None:
     assert scope["type"] == "http"
     method = scope["method"]
     path = scope["path"]

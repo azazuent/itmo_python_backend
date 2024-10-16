@@ -4,7 +4,7 @@ from typing import Any
 import pytest
 from async_asgi_testclient import TestClient
 
-from ..HW1.main import application
+from hw1.main import app
 
 
 @pytest.mark.xfail()
@@ -19,7 +19,7 @@ from ..HW1.main import application
     ],
 )
 async def test_not_found(method: str, path: str):
-    async with TestClient(application) as client:
+    async with TestClient(app) as client:
         response = await client.open(
             path,
             method=method,
@@ -43,7 +43,7 @@ async def test_not_found(method: str, path: str):
     ],
 )
 async def test_factorial(query: dict[str, Any], status_code: int):
-    async with TestClient(application) as client:
+    async with TestClient(app) as client:
         response = await client.get("/factorial", query_string=query)
 
     assert response.status_code == status_code
@@ -64,7 +64,7 @@ async def test_factorial(query: dict[str, Any], status_code: int):
     ],
 )
 async def test_fibonacci(params: str, status_code: int):
-    async with TestClient(application) as client:
+    async with TestClient(app) as client:
         response = await client.get("/fibonacci" + params)
 
     assert response.status_code == status_code
@@ -85,7 +85,7 @@ async def test_fibonacci(params: str, status_code: int):
     ],
 )
 async def test_mean(json: dict[str, Any] | None, status_code: int):
-    async with TestClient(application) as client:
+    async with TestClient(app) as client:
         response = await client.get("/mean", json=json)
 
     assert response.status_code == status_code
