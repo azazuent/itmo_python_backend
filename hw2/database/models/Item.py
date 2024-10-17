@@ -1,22 +1,29 @@
-from typing import Optional
+from typing import Optional, Annotated
 
-from pydantic import BaseModel
+from pydantic import BaseModel, NonNegativeFloat, ConfigDict
 
 
-class Item(BaseModel):
+class ItemBase(BaseModel):
     name: str
-    price: float
+    price: Annotated[float, NonNegativeFloat]
+
+
+class ItemCreate(ItemBase):
     deleted: Optional[bool] = False
 
 
-class ItemWithId(Item):
+class Item(ItemCreate):
     id: int
 
 
-class ItemUpdate(BaseModel):
+class ItemPatch(ItemBase):
     name: Optional[str] = None
-    price: Optional[float] = None
+    price: Optional[Annotated[float, NonNegativeFloat]] = None
+
+    model_config = ConfigDict(
+        extra='forbid'
+    )
 
 
-class ItemCart(ItemWithId):
-    quantity: int
+class ItemPut(ItemBase):
+    ...

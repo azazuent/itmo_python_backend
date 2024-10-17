@@ -1,81 +1,64 @@
-from ..models.Item import Item, ItemWithId, ItemUpdate
+from typing import Optional
 
-from ..DBExceptions import NotFound, AlreadyExists, NotModified
+from sqlalchemy.orm import Session
 
-items: dict[int, ItemWithId] = {}
-next_id: int = 0
-
-
-def create_item(item: Item) -> ItemWithId:
-    global items, next_id
-
-    if item.name in [value.name for value in items.values()]:
-        raise AlreadyExists
-
-    item_with_id = item.model_dump()
-    item_with_id["id"] = next_id
-    item_with_id = ItemWithId.parse_obj(item_with_id)
-
-    items[next_id] = item_with_id
-    next_id += 1
-
-    return item_with_id
+from ..models.Item import ItemCreate, ItemPut, ItemPatch
+from ..schemas.Item import Item as DBItem
 
 
-def read_item(item_id: int) -> ItemWithId:
-    if item_id not in items:
-        raise NotFound
+def create_item(db: Session, item: ItemCreate) -> DBItem:
+    db_item = DBItem(
+        name=item.name,
+        price=item.price,
+        deleted=item.deleted
+    )
 
-    return items[item_id]
+    db.add(db_item)
+    db.commit()
+    db.refresh(db_item)
 
-
-def read_items(limit: int = 50, offset: int = 0) -> list[ItemWithId]:
-    item_list = list(items.values())
-    item_list_size = len(item_list)
-
-    start = offset
-    end = min(item_list_size, offset + limit)
-
-    if offset > item_list_size:
-        return []
-
-    return item_list[start:end]
+    return db_item
 
 
-def put_item(item_id: int, item: Item):
-    global items
-
-    if item.name in [value.name for value in items.values() if value.id != item_id]:
-        raise AlreadyExists
-
-    item["id"] = item_id
-    items[item_id] = ItemWithId.parse_obj(item)
-
-    return items[item_id]
+def read_item(db: Session, item_id: int) -> DBItem:
+    return db.get(DBItem, item_id)
 
 
-def update_item(item_id: int, item: ItemUpdate) -> ItemWithId:
-    global items
-
-    if item_id not in items:
-        raise NotFound
-
-    item = item.model_dump(exclude_unset=True)
-    if not item:
-        raise NotModified
-
-    updated_item = items[item_id].model_dump()
-    updated_item.update(item)
-
-    items[item_id] = ItemWithId.parse_obj(updated_item)
-
-    return items[item_id]
+def read_item_by_name(db: Session, item_name: str) -> DBItem:
+    return db.query(DBItem).filter(DBItem.name == item_name).first()
 
 
-def delete_item(item_id: int) -> None:
-    global items
+def read_items(db: Session,
+               limit: int, offset: int,
+               min_price: Optional[float], max_price: Optional[float],
+               show_deleted: Optional[bool]
+               ) -> list[DBItem]:
+    items = db.query(DBItem)
 
-    if item_id not in items:
-        raise NotFound
+    if min_price is not None:
+        items = items.filter(DBItem.price >= min_price)
+    if max_price is not None:
+        items = items.filter(DBItem.price <= max_price)
 
-    del items[item_id]
+    if show_deleted is not None and show_deleted is False:
+        items = items.filter(DBItem.deleted is False)
+
+    return items.limit(limit).offset(offset).all()
+
+
+def update_item(db: Session, db_item: DBItem, item_update: ItemPut | ItemPatch) -> DBItem:
+    update_data = item_update.model_dump(exclude_unset=True)
+
+    for key, value in update_data.items():
+        setattr(db_item, key, value)
+
+    db.add(db_item)
+    db.commit()
+    db.refresh(db_item)
+
+    return db_item
+
+
+def delete_item(db: Session, db_item: DBItem) -> None:
+    db_item.deleted = True
+    db.commit()
