@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 from http import HTTPStatus
 from typing import Annotated, Optional
 
-from ..database import CartCRUD, ItemCRUD, CartModels, get_db
+from database import CartCRUD, ItemCRUD, CartModels, get_db
 
 router = APIRouter(
     prefix="/cart",
