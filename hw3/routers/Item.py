@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from http import HTTPStatus
 from typing import Optional
 
-from ..database import ItemCRUD, ItemModels, get_db
+from database import ItemCRUD, ItemModels, get_db
 
 
 router = APIRouter(

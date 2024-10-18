@@ -4,8 +4,8 @@ import uvicorn
 from fastapi import FastAPI
 from prometheus_fastapi_instrumentator import Instrumentator
 
-from .database import create_schema
-from .routers import items_router, carts_router
+from database import create_schema
+from routers import items_router, carts_router
 
 # Почему-то не работает через lifespan
 # @asynccontextmanager
